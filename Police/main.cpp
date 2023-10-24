@@ -100,6 +100,7 @@ public:
 		set_time(time.c_str());
 	}
 	~Crime(){}
+
 };
 std::ostream& operator<<(std::ostream& os, const Crime& obj)
 {
