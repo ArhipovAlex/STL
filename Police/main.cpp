@@ -147,7 +147,6 @@ public:
 	}
 	~LicencePlate() {}
 
-
 	bool operator<(const LicencePlate& other)const
 	{
 		return this->plate < other.plate;
@@ -159,6 +158,13 @@ public:
 
 };
 
+std::istream& operator>>(std::istream& is, LicencePlate& obj)
+{
+	std::string plate;
+	is >> plate;
+	obj.set_plate(plate);
+	return is;
+}
 std::ostream& operator<<(std::ostream& os, const LicencePlate& obj)
 {
 	return os << obj.get_plate();
@@ -172,6 +178,8 @@ std::ifstream& getline(std::ifstream& ifs, LicencePlate& obj, char delim)
 }
 
 void print(const std::map<LicencePlate, std::list<Crime>>& base);
+void print(const std::map<LicencePlate, std::list<Crime>>& base, LicencePlate plate);
+void print(const std::map<LicencePlate, std::list<Crime>>& base, LicencePlate start_plate, LicencePlate end_plate);
 void save(const std::map<LicencePlate, std::list<Crime>>& base, const std::string& filename);
 std::map<LicencePlate, std::list<Crime>>load(const std::string& filename);
 
@@ -187,8 +195,7 @@ void main()
 	/*
 	Crime crime(1, "ул. Ленина", "16:20 24/10/2023");
 	cout << crime << endl;
-	*/
-	/*LicencePlate plate("m777ab"); cout << plate << endl;
+	LicencePlate plate("m777ab"); cout << plate << endl;
 	LicencePlate plate_1("VasyaTupenko"); cout << plate_1 << endl;*/
 	/*std::map<LicencePlate, std::list<Crime>>base =
 	{
@@ -199,11 +206,51 @@ void main()
 	print(base);
 	save(base, "base.txt");*/
 	std::map<LicencePlate, std::list<Crime>> base = load("base.txt");
+	print(base);
+	/*
+	LicencePlate plate;
+	cout << "Введите номер: "; cin >> plate;
+	print(base, plate);*/
+	LicencePlate start_plate, end_plate;
+	cout << "Введите начальный номер: "; cin >> start_plate;
+	cout << "Введите конечный номер: "; cin >> end_plate;
+	print(base,start_plate,end_plate);
+	system("PAUSE");
+	system("CLS");
+	main();
 }
 
 void print(const std::map<LicencePlate, std::list<Crime>>& base)
 {
+	cout << "Base size: " << base.size() << endl;
 	for (std::map<LicencePlate, std::list<Crime>>::const_iterator bit = base.begin(); bit != base.end(); ++bit)
+	{
+		cout << bit->first << ":\n";
+		for (std::list<Crime>::const_iterator it = bit->second.begin(); it != bit->second.end(); ++it)
+		{
+			cout << tab << *it << ";\n";
+		}
+		cout << endl;
+	}
+}
+void print(const std::map<LicencePlate, std::list<Crime>>& base, LicencePlate plate)
+{
+	try 
+	{
+		cout << "Plate: " << plate << " violations:\n";
+		for (std::list<Crime>::const_iterator it = base.at(plate).cbegin(); it != base.at(plate).cend(); ++it)
+		{
+			cout << tab << *it << ";\n";
+		}
+	}
+	catch (const std::exception& e)
+	{
+		std::cout << "В базе нет такого номера" << endl;
+	}
+}
+void print(const std::map<LicencePlate, std::list<Crime>>& base, LicencePlate start_plate, LicencePlate end_plate)
+{
+	for (std::map<LicencePlate, std::list<Crime>>::const_iterator bit = base.lower_bound(start_plate); bit != base.upper_bound(end_plate); ++bit)
 	{
 		cout << bit->first << ":\n";
 		for (std::list<Crime>::const_iterator it = bit->second.begin(); it != bit->second.end(); ++it)
@@ -240,19 +287,26 @@ std::map<LicencePlate, std::list<Crime>> load(const std::string& filename)
 		while (!fin.eof())
 		{
 			LicencePlate plate;
-			Crime crime;
 			getline(fin, plate, ':');
 			std::string all_crimes;
 			std::getline(fin, all_crimes);
-			cout << plate << tab << all_crimes << endl;
-			char* all_crimes_buffer = new char[all_crimes.size()] {};
+			//cout << plate << tab << all_crimes << endl;
+			char* all_crimes_buffer = new char[all_crimes.size()+1] {};
 			strcpy(all_crimes_buffer, all_crimes.c_str());
 			char delim[] = ":,;";
 			for (char* pch = strtok(all_crimes_buffer, delim); pch; pch = strtok(NULL, delim))
 			{
+				Crime crime;
 				crime.set_time(atoi(pch));
-
+				crime.set_id(atoi(strrchr(pch, ' ')+1));
+				while(pch[0]==' ') 
+					pch = strchr(pch, ' ') + 1;
+				pch = strchr(pch, ' ') + 1;
+				*strrchr(pch, ' ') = 0;
+				crime.set_place(pch);
+				base[plate].push_back(crime);
 			}
+			delete[] all_crimes_buffer;
 		}
 		fin.close();
 	}
