@@ -1,6 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include<iostream>
 #include<fstream>
+#include<conio.h>
 #include<string>
 #include<map>
 #include<ctime>
@@ -11,6 +12,9 @@ using std::endl;
 
 #define tab "\t"
 #define delimiter "\n--------------------------\n"
+
+
+#define Escape 27
 
 const std::map<int, std::string>VIOLATIONS =
 {
@@ -25,7 +29,6 @@ const std::map<int, std::string>VIOLATIONS =
 	{8, "Оставление места ДТП"},
 	{9, "ремень безопасности"}
 };
-
 
 
 class Crime
@@ -113,6 +116,7 @@ public:
 	~Crime(){}
 
 };
+
 std::ostream& operator<<(std::ostream& os, const Crime& obj)
 {
 	const int SIZE = 32;
@@ -211,13 +215,55 @@ void main()
 	LicencePlate plate;
 	cout << "Введите номер: "; cin >> plate;
 	print(base, plate);*/
-	LicencePlate start_plate, end_plate;
+
+	/*LicencePlate start_plate, end_plate;
 	cout << "Введите начальный номер: "; cin >> start_plate;
 	cout << "Введите конечный номер: "; cin >> end_plate;
-	print(base,start_plate,end_plate);
-	system("PAUSE");
-	system("CLS");
-	main();
+	print(base,start_plate,end_plate);*/
+	
+	char key;
+	do
+	{
+		key = getch();
+		cout << "1. Вывод всей базы;" << endl;
+		cout << "2. Вывод информации по номеру;" << endl;
+		cout << "3. Вывод информации по диапазону номеров;" << endl;
+		cout << "4. Добавить нарушение;" << endl;
+		cout << "5. Загрузить базу из файла;" << endl;
+		cout << "6. Сохранить базу в файл;" << endl;
+		switch (key)
+		{
+		case 1:print(base); break;
+		case 2:
+		{
+			LicencePlate plate;
+			cout << "Введите номер: "; cin >> plate;
+			print(base, plate);
+		}
+			break;
+		case 3:
+		{
+			LicencePlate start_plate, end_plate;
+			cout << "Введите начальный номер: "; cin >> start_plate;
+			cout << "Введите конечный номер: "; cin >> end_plate;
+			print(base, start_plate, end_plate);
+		}
+			break;
+		case 4:
+		{
+			LicencePlate plate;
+			Crime crime;
+			cout << "Введите номер: "; cin >> plate;
+			cout << "Введите время: "; cin >> plate;
+			cout << "Введите место: "; cin >> plate;
+			cout << "Введите нарушение: "; cin >> crime;
+		}
+			break;
+		}
+	} while (key != Escape);
+	//system("PAUSE");
+	//system("CLS");
+	//main();
 }
 
 void print(const std::map<LicencePlate, std::list<Crime>>& base)
