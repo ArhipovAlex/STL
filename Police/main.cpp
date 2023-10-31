@@ -252,11 +252,15 @@ void main()
 		case 4:
 		{
 			LicencePlate plate;
-			Crime crime;
+			
 			cout << "¬ведите номер: "; cin >> plate;
-			cout << "¬ведите врем€: "; cin >> plate;
+			int id; 
+			std::string place;
+			std::string time;
+			cout << "¬ведите врем€: "; cin >> time;
 			cout << "¬ведите место: "; cin >> plate;
-			cout << "¬ведите нарушение: "; cin >> crime;
+			cout << "¬ведите нарушение: "; cin >> id;
+			Crime crime(id,place,time);
 		}
 			break;
 		}
